@@ -39,27 +39,31 @@
 - Navigation Enable
 
 
+```python
+    class GlobalInfo():
+        def __init__(self):
+            assignmnet = {"Role_0":None,"Role_1":None,
+                    "Role_2":None,"Role_3":None,
+                    "Role_4":None,"Role_5":None} # assignment
+
+            
+```
+
 
 ```python
-
-
     
-    def update():
+    def update(self):
         WorldModel.update()
         self.select_play()
         
-        result = self.execute_play()
+        self.execute_play()
         
-        self.evaluate_play(result)
+        self.evaluate_play()
+
     
-    def select_play():
-        situation = WorldModel.situation
-        recent_situation = WorldModel.recent_situation
+    def select_play(self):
         
-        if self.play.done == situation or \
-                self.play.done_aborted != situation or \
-                self.play.recent_done == recent_situation or \
-                self.play.recent_done_aborted != recent_situation:
+        if self.play_termination:
 
             # Extract possible plays from playbook
             possible_plays = []
@@ -71,9 +75,42 @@
             self.play = randomly_select(possible_plays)
 
             WorldModel.reset_recent_situation()
+            self.play_past_time = CurrentTime()
+            self.play_termination = False
+            RoleAssignemnt(self.play.roles)
 
-    def execute_play():
 
+    def execute_play(self):
+        for role in self.play.roles:
+            role.behavior.run()
+
+
+    def evaluate_play(self):
+        for role in self.play.roles:
+            status = role.behavior.get_status()
+
+            if role.loop_enable:
+                if status != TaskStatus.RUNNING:
+                    role.behavior.reset()
+            else:
+                if status != TaskStatus.RUNNING:
+                    self.play_termination = True
+
+        if self.play.timeout:
+            if CurrentTime() - self.play_past_time > self.play.timeout:
+                self.play_termination = True
+
+        if WorldModel.situations[self.play.done] or \
+                not WorldModel.situations[self.play.done_aborted] or \
+                WorldModel.recent_situations[self.play.recent_done] or \
+                not WorldModel.recent_situations[self.play.recent_done_aborted]:
+
+                self.play_termination = True
+```
+
+```python
+    class Role():
+        def __init__(self)
 
 ```
 
