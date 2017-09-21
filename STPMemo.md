@@ -109,8 +109,20 @@
 ```
 
 ```python
+    class Play():
+        def __init__(self, name):
+            self.name = name
+            self.applicable = None
+            
+
+```
+
+```python
     class Role():
-        def __init__(self)
+        def __init__(self, name):
+            self.behavior = Sequence(name) # name like a "Role_0".
+            
+            
 
 ```
 
