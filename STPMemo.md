@@ -1,4 +1,8 @@
 
+# References
+- [STP: SKills, Tactics and Plays](https://pdfs.semanticscholar.org/5087/460f31babc3fbafafddbb480f216ea72832e.pdf)
+
+
 # ルール
 - RoleとRobot_IDの変換はWorldModel内のAssignmentのみで行う
 - SkillはRoleを頼りに見方ロボットの情報を得る
@@ -147,7 +151,7 @@
 
             self.roles[0].loop_enable = True
             self.roles[0].behavior.add_child(
-                    Tactics.StopGoalie(
+                    Tactics.Goalie(
                         "StopGoalie", 
                         self.roles[0].my_role))
 
@@ -163,9 +167,9 @@
                         "StopLeft",
                         self.roles[2].my_role))
 
-    class PlayOffense(Play):
+    class PlayOneAttack(Play):
         def __init__(self):
-            super(PlayOffense, self).__init__("PlayOffense")
+            super(PlayOneAttack, self).__init__("PlayOneAttack")
 
             self.applicable = "OFFENSE" # RefereeがOFFENSEなら実行する
             self.done_aborted = "OFFENSE" # RefereeがOFFENSEじゃなくなったらやめる
@@ -181,15 +185,25 @@
                         "Goalie",
                         self.roles[0].my_role))
 
-            self.roles[1].behavior.add_child(
+            # role_2はloop_enableしないので、Shootが成功or失敗するとPlayがおわる
+            self.roles[1].behavior.add_child( # ボールまで移動する
                     Tactics.DriveToBall(
                         "DriveToBall",
                         self.roles[1].my_role))
-            self.roles[1].behavior.add_child(
+            self.roles[1].behavior.add_child( # Shootする
                     Tactics.Shoot(
                         "DriveToBall",
                         self.roles[1].my_role,
-                        "Aim"))
+                        "Aim")) # ゴールを狙う NoAim: とりあえずける Deflect: 跳ね返す
+
+
+            self.roles[2].behavior.add_child(
+                    Tactics.Defend(
+                        "Defend",
+                        self.roles[2].my_role,
+                        Coordinate() # Coordinateっていう素晴らしいクラスを作る予定
+                        )
+
 
 
                         
@@ -231,6 +245,7 @@
 
 ```python
 
+    # Abstract Base Classを使うよ
     class Skill(Task):
         def __init__(self, name, my_role):
             super(Skill, self).__init__(name)
