@@ -52,6 +52,16 @@
 - Dribble Enable
 - Navigation Enable
 
+## Assignment
+
+```python
+    unassigned_roles, unassigned_ids = check_unassignment(assignment, existing_friends_id)
+
+    numerical_assignment(deleted_roles, unassigned_ids)
+    
+
+```
+
 
 ```python
     class WorldModel():
